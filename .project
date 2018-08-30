@@ -3,6 +3,7 @@
 	<name>pyfantasy</name>
 	<comment></comment>
 	<projects>
+		<project>YahooSports</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
