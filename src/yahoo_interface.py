@@ -19,7 +19,13 @@ def query_yahoo(session, query):
 def print_yahoo_result(result):    
     print(result.clean_text)
     
+def query_league(session, league_number=None):
+    if not league_number:
+        league_number = input("League number is: ")
+    query = "league/nfl.l."+str(league_number) # get league info    
     
+    return query_yahoo(session, query)
+        
 #     brett_favre_xml = session.get("game/223/players;player_keys=223.p.1025/draft_analysis")
 #     print(brett_favre_xml)
 #     print(brett_favre_xml.clean_text)
@@ -37,6 +43,8 @@ if __name__ == "__main__":
     session = use_saved_session(auth_filename)
     query = "game/nfl/players" # get all the players
     query = "game/nfl/players/draft_analysis" # get all the players, with draft analysis
+    
+
     result = query_yahoo(session, query)
     print(result)
     print_yahoo_result(result)
