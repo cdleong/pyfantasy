@@ -1,3 +1,8 @@
+'''
+Created on Aug 29, 2018
+
+@author: cdleong
+'''
 from YahooSports import YahooConnection
 
 def make_saved_session(auth_filename):
