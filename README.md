@@ -17,7 +17,7 @@ Using Python to have fun with fantasy sports!
 * **[Colin Leong]((https://github.com/cdleong))**  
 
 ## Acknowledgments
-* [thorr](https://github.com/thorrr) the author of [YahooSports](https://github.com/thorrr/YahooSports), which I'm using to pull data down.
+* [Jason Bell](https://github.com/thorrr) the author of [YahooSports](https://github.com/thorrr/YahooSports), which I'm using to pull data down.
 
 ## License
 
