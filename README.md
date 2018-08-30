@@ -4,9 +4,8 @@ Using Python to have fun with fantasy sports!
 
 ## Authors
 
-* **[Colin Leong]((https://github.com/cdleong))** - 
+* **[Colin Leong]((https://github.com/cdleong))**  
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 
