@@ -8,11 +8,14 @@ Created on Aug 29, 2018
 import YahooSports as ysp
 import math
 
-nfl_players_per_team = 53
-nfl_teams = 32
-max_nfl_players = nfl_players_per_team*nfl_teams
-max_count_yahoo_returns_per_query = 25  # determined experimentally
-max_queries = math.ceil(max_nfl_players/max_count_yahoo_returns_per_query)
+# CONSTANTS
+NFL_PLAYERS_PER_TEAM = 53
+NUMBER_OF_NFL_TEAMS = 32
+NUMBER_OF_DEFENSES = NUMBER_OF_NFL_TEAMS
+MAX_NFL_PLAYERS = (NFL_PLAYERS_PER_TEAM*NUMBER_OF_NFL_TEAMS) + NUMBER_OF_DEFENSES
+MAX_RETURNED_PER_QUERY = 25  # determined experimentally
+MAX_QUERY = math.ceil(MAX_NFL_PLAYERS/MAX_RETURNED_PER_QUERY)
+POSSIBLE_POSITIONS = ["QB", "WR", "RB", "TE", "K" , "DEF"]
 
 
 def make_saved_session(auth_filename):
@@ -38,12 +41,12 @@ def get_xml_from_yahoo_result(result):
 
 def get_players_for_position(session, position):
     xml_results = []
-    count = max_count_yahoo_returns_per_query
+    count = MAX_RETURNED_PER_QUERY
     start = 0
     count_string = "players count"
     i = 0
     more_players_to_retrieve = True
-    while i < max_queries and more_players_to_retrieve:
+    while i < MAX_QUERY and more_players_to_retrieve:
         start = i * count
         i += 1
         query = "game/nfl/players;out=draft_analysis,percent_owned;position=" + position + ";count=" + str(count) + ";start=" + str(start)
@@ -91,14 +94,12 @@ if __name__ == "__main__":
     query = "game/nfl/players;out=draft_analysis,percent_owned" # get all the players, with percent_owned
     query = "game/nfl/players;out=draft_analysis,percent_owned;position=QB;count=25"
     
-    position = "WR"  
     
-    xml_results = get_players_for_position(session, position)
-        
-        
+    for position in POSSIBLE_POSITIONS:
+        xml_results = get_players_for_position(session, position)
 
-    filename = position + ".txt"
-    with open(filename, "a") as text_file: 
-        for result in xml_results:
-            print(f"{result}", file=text_file)
+        filename = position + ".txt"
+        with open(filename, "a") as text_file: 
+            for result in xml_results:
+                print(f"{result}", file=text_file)
     print("done")
