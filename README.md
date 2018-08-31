@@ -19,6 +19,7 @@ Using Python to have fun with fantasy sports!
 ## Acknowledgments
 * [Jason Bell](https://github.com/thorrr) the author of [YahooSports](https://github.com/thorrr/YahooSports), which I'm using to pull data down.
 
+
 ## License
 
 This project is licensed under the GPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
