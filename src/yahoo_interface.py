@@ -2,6 +2,8 @@
 Created on Aug 29, 2018
 
 @author: cdleong
+
+
 '''
 import YahooSports as ysp
 import math
@@ -32,6 +34,31 @@ def query_yahoo(session, query):
 def get_xml_from_yahoo_result(result):
     
     return result.clean_text
+
+
+def get_players_for_position(session, position):
+    xml_results = []
+    count = max_count_yahoo_returns_per_query
+    start = 0
+    count_string = "players count"
+    i = 0
+    more_players_to_retrieve = True
+    while i < max_queries and more_players_to_retrieve:
+        start = i * count
+        i += 1
+        query = "game/nfl/players;out=draft_analysis,percent_owned;position=" + position + ";count=" + str(count) + ";start=" + str(start)
+        result = query_yahoo(session, query)
+        xml = get_xml_from_yahoo_result(result)
+        xml_results.append(xml)
+        if count_string not in xml:
+            print("count is zero, breaking out of loop")
+            more_players_to_retrieve = False
+        else:
+            matched_lines = [line for line in xml.split('\n') if count_string in line]
+            print("COUNT: {}".format(matched_lines))
+    
+    return xml_results
+
     
 def query_league(session, subquery="", league_number=None,):
     if not league_number:
@@ -64,35 +91,9 @@ if __name__ == "__main__":
     query = "game/nfl/players;out=draft_analysis,percent_owned" # get all the players, with percent_owned
     query = "game/nfl/players;out=draft_analysis,percent_owned;position=QB;count=25"
     
-    xml_results = []
-    count = max_count_yahoo_returns_per_query
-    start = 0
-    position = "QB"
+    position = "WR"  
     
-   
-   
-    result = query_yahoo(session, query)
-    xml = get_xml_from_yahoo_result(result)
-    
-    
- 
-    
-    count_string = "players count"
-    
-    for i in range(0, max_queries):
-        start = i*count
-        
-        query = "game/nfl/players;out=draft_analysis,percent_owned;position="+position+";count="+str(count)+";start="+str(start) 
-        result = query_yahoo(session, query)
-        xml = get_xml_from_yahoo_result(result)
-        xml_results.append(xml)
-        
-        if count_string not in xml:
-            print("count is zero, breaking out of loop")
-            break
-        else:
-            matched_lines = [line for line in xml.split('\n') if count_string in line]
-            print("COUNT: {}".format(matched_lines))
+    xml_results = get_players_for_position(session, position)
         
         
 
