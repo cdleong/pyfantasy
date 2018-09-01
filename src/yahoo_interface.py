@@ -114,14 +114,14 @@ class PyfantasyYahooSportsInterface(object):
     #     print(players_xml.clean_text)
          
     
-    def clear_text_file_and_write(self, filename, contents_to_write):
-        filename = filename + ".txt"
+    def clear_text_file_and_write(self, base_filename, contents_to_write):
+        base_filename = base_filename + ".txt"
         
         #clear it first
-        open(filename, 'w').close()
+        open(base_filename, 'w').close()
         
         #  add the text
-        with open(filename, "a") as text_file:     
+        with open(base_filename, "a") as text_file:     
             print(f"{contents_to_write}", file=text_file)    
     
     
@@ -133,18 +133,18 @@ if __name__ == "__main__":
     
     # experimentally determined that there's 2789 "players" in the Yahoo DB. 
     xml_results = pyfsi.get_players_data()
-    filename = "all_players" + ".txt" 
+    base_filename = "all_players"
     for result in xml_results:
-        pyfsi.clear_text_file_and_write(filename, result)
+        pyfsi.clear_text_file_and_write(base_filename, result)
     
 #     
 #     # get a result for each position
 #     for position in POSSIBLE_POSITIONS:
 #         xml_results = get_players_data(session, position)
 #  
-#         filename = position + ".txt"
+#         base_filename = position + ".txt"
 #         for result in xml_results:
-#             pyfsi.clear_text_file_and_write(filename, xml_result)
+#             pyfsi.clear_text_file_and_write(base_filename, xml_result)
                 
                 
     print("done")
