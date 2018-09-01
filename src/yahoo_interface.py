@@ -12,9 +12,9 @@ import math
 NFL_PLAYERS_PER_TEAM = 53
 NUMBER_OF_NFL_TEAMS = 32
 NUMBER_OF_DEFENSES = NUMBER_OF_NFL_TEAMS
-MAX_NFL_PLAYERS = (NFL_PLAYERS_PER_TEAM*NUMBER_OF_NFL_TEAMS) + NUMBER_OF_DEFENSES
+MAX_NFL_PLAYERS = (NFL_PLAYERS_PER_TEAM*NUMBER_OF_NFL_TEAMS) + NUMBER_OF_DEFENSES # TODO: fix this. There's actually about double this number somehow
 MAX_RETURNED_PER_QUERY = 25  # determined experimentally
-MAX_QUERY = math.ceil(MAX_NFL_PLAYERS/MAX_RETURNED_PER_QUERY)
+MAX_QUERY = math.ceil(MAX_NFL_PLAYERS/MAX_RETURNED_PER_QUERY)*2 
 POSSIBLE_POSITIONS = ["QB", "WR", "RB", "TE", "K" , "DEF"]
 
 
@@ -39,17 +39,34 @@ def get_xml_from_yahoo_result(result):
     return result.clean_text
 
 
-def get_players_for_position(session, position):
+def get_players_data(session, position=""):
     xml_results = []
     count = MAX_RETURNED_PER_QUERY
     start = 0
     count_string = "players count"
     i = 0
     more_players_to_retrieve = True
+    
+    
     while i < MAX_QUERY and more_players_to_retrieve:
         start = i * count
         i += 1
-        query = "game/nfl/players;out=draft_analysis,percent_owned;position=" + position + ";count=" + str(count) + ";start=" + str(start)
+        
+        print(f"i: {i}, start:{start}")
+        
+        # base query
+        query = "game/nfl/players;out=draft_analysis,percent_owned"
+        
+        # Just one position?
+        if position:
+            print(f"adding position {position} to query")
+            query = query + ";position=" + position
+                
+        query = query+";count=" + str(count)             
+        query = query + ";start=" + str(start)
+        
+        print(f"Final query: {query}")
+        
         result = query_yahoo(session, query)
         xml = get_xml_from_yahoo_result(result)
         xml_results.append(xml)
@@ -81,6 +98,12 @@ def query_league(session, subquery="", league_number=None,):
 #     players_xml = session.get("game/nfl/players")
 #     print(players_xml.clean_text)
      
+
+def append_to_text_file(filename, text_to_append):
+    filename = filename + ".txt"
+    with open(filename, "a") as text_file:     
+        print(f"{text_to_append}", file=text_file)    
+    
     
 if __name__ == "__main__":
 
@@ -94,12 +117,20 @@ if __name__ == "__main__":
     query = "game/nfl/players;out=draft_analysis,percent_owned" # get all the players, with percent_owned
     query = "game/nfl/players;out=draft_analysis,percent_owned;position=QB;count=25"
     
+    # experimentally determined that there's 2789 "players" in the Yahoo DB. 
+    xml_results = get_players_data(session)
+    filename = "all_players" + ".txt" 
+    for result in xml_results:
+        append_to_text_file(filename, result)
     
-    for position in POSSIBLE_POSITIONS:
-        xml_results = get_players_for_position(session, position)
-
-        filename = position + ".txt"
-        with open(filename, "a") as text_file: 
-            for result in xml_results:
-                print(f"{result}", file=text_file)
+#     
+#     # get a result for each position
+#     for position in POSSIBLE_POSITIONS:
+#         xml_results = get_players_data(session, position)
+#  
+#         filename = position + ".txt"
+#         for result in xml_results:
+#             append_to_text_file(filename, xml_result)
+                
+                
     print("done")
