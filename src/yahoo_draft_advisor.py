@@ -46,21 +46,24 @@ class PyFantasyYahooDraftAdvisor(object):
         
         :param players_list:
         '''
+        
+        print(f"preprocessing for '-' adp: initial size: {len(players_list)}")
         processed_list = []
         for player_dict in players_list:
             player = ynp.YahooNFLPlayer(player_dict)
             if player.get_adp() is not "-":
                 processed_list.append(player)
+        
+        
+        print(f"New size: {len(processed_list)}")
+        
                 
         # https://stackoverflow.com/questions/403421/how-to-sort-a-list-of-objects-based-on-an-attribute-of-the-objects
         # https://stackoverflow.com/questions/4010322/sort-a-list-of-class-instances-python
         
-        print(f"First item: {processed_list[0]}")
-        print(f"First item: {processed_list[0].get_adp()}")
-        
-        print(f"sorting. size: {len(processed_list)}")
+        print("Sorting list.")
         processed_list.sort(key=operator.attrgetter('adpf'))
-        print(f"sorting. size: {len(processed_list)}")
+        
         return processed_list
 
             
