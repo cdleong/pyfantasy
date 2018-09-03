@@ -62,10 +62,24 @@ class PyFantasyYahooDraftAdvisor(object):
         
         return processed_list
 
-            
-    def get_top_draftable_players(self, num_players=15):
+
+    
+    def get_top_draftable_players(self, num_players=15, position=""):
+        
         self.draftable_players_list.sort(key=operator.attrgetter('adpf'))
-        return self.draftable_players_list[0:num_players]
+        
+        players_to_return = []
+        if position:
+            print(f"getting top players for {position}")
+            for player in self.draftable_players_list:
+                if player.get_position() == position:
+                    players_to_return.append(player)
+                
+        else: 
+            players_to_return = self.draftable_players_list
+        
+        players_to_return = players_to_return[0:num_players]
+        return players_to_return
             
     
     
@@ -94,10 +108,6 @@ class PyFantasyYahooDraftAdvisor(object):
 
     
     
-    def highest_priority_position_to_draft_next(self):
-        print("TODO:")
-        #
-        
     
     def get_all_players_for_position(self, position):
         players_for_position = []
@@ -127,6 +137,14 @@ class PyFantasyYahooDraftAdvisor(object):
             self.avg_adp_for_each_position = self._calulate_avg_adp_for_each_position()
 
         return self.avg_adp_for_each_position
+    
+    def sort_positions_based_on_avg_adp(self):
+        position_adp_list = list(self.get_avg_adp_for_each_position().items())
+        print(f"Items: {position_adp_list}")
+        print(f"first item: {position_adp_list[0]}")
+        # https://stackoverflow.com/questions/3121979/how-to-sort-list-tuple-of-lists-tuples
+        position_adp_list.sort(key= lambda tup: tup[1])
+        return position_adp_list
 
 def main():
     
@@ -154,6 +172,9 @@ def main():
     pos_avg_adp_dict = my_draft_advisor.get_avg_adp_for_each_position()
     print(f"Average adp for each position: {pos_avg_adp_dict}")
     
+    position_based_draft_order_avg_adp = my_draft_advisor.sort_positions_based_on_avg_adp()
+    print(f"Based on avg adp, the positional priority list is: {position_based_draft_order_avg_adp}")
+    
     
     
 
@@ -178,7 +199,17 @@ def main():
     random_draftable = random.choice(top_draftable_players)      
     my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=True)
     
+    
+    
+    for position in ysi.PyFantasyYahooSportsInterface.POSSIBLE_POSITIONS:
+        top_draftable_for_pos =  my_draft_advisor.get_top_draftable_players(3, position=position)
+        
+        print(f"TOP PLAYERS FOR POSITION: {position}")
+        for idx, draftable in enumerate(top_draftable_for_pos):        
+            print(f"#{idx}: Name: {draftable.get_full_name()}, adp:{draftable.get_adp()}, position:{draftable.get_position()}, player_key: {draftable.get_player_key()}")
+    
 
+    
     
 if __name__ == '__main__':
     main()
