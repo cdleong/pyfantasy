@@ -27,8 +27,8 @@ class PyFantasyYahooDraftAdvisor(object):
         self.original_draftable_players_list = self.draftable_players_list.copy()
         self.drafted_by_others = []
         self.drafted_by_me = []
-        self.avg_adp_for_each_position = None
         self.roster_positions = league_roster_positions
+        self.avg_adp_for_each_position = self._calulate_avg_adp_for_each_position()
         
         
                 
@@ -70,7 +70,7 @@ class PyFantasyYahooDraftAdvisor(object):
         
         players_to_return = []
         if position:
-            print(f"getting top players for {position}")
+#             print(f"getting top players for {position}")
             for player in self.draftable_players_list:
                 if player.get_position() == position:
                     players_to_return.append(player)
@@ -104,7 +104,7 @@ class PyFantasyYahooDraftAdvisor(object):
         else:
             print(f"Can't draft {player_key}. Not found in draftable players")
 
-        print(f"After drafting a player, draftable players: {len(self.draftable_players_list)}")
+#         print(f"After drafting a player, draftable players: {len(self.draftable_players_list)}")
 
     
     
@@ -117,7 +117,7 @@ class PyFantasyYahooDraftAdvisor(object):
         return players_for_position
             
     
-    def calculate_avg_adp_for_position(self, position):
+    def _calculate_avg_adp_for_position(self, position):
         players_at_position = self.get_all_players_for_position(position)
         sum_adp = sum(player.get_adpf() for player in players_at_position)
         avg_adp = sum_adp/len(players_at_position)
@@ -126,17 +126,15 @@ class PyFantasyYahooDraftAdvisor(object):
     def _calulate_avg_adp_for_each_position(self):
         pos_avg_adp_dict = {}
         for position in ysi.PyFantasyYahooSportsInterface.POSSIBLE_POSITIONS:
-            avg_adp = self.calculate_avg_adp_for_position(position)
+            avg_adp = self._calculate_avg_adp_for_position(position)
 #             print(f"average adp for position {position}: {avg_adp}")
             pos_avg_adp_dict[position]=avg_adp
             
         return pos_avg_adp_dict
     
     def get_avg_adp_for_each_position(self):
-        if self.avg_adp_for_each_position is None:
-            self.avg_adp_for_each_position = self._calulate_avg_adp_for_each_position()
-
         return self.avg_adp_for_each_position
+        
     
     def sort_positions_based_on_avg_adp(self):
         position_adp_list = list(self.get_avg_adp_for_each_position().items())
@@ -145,6 +143,36 @@ class PyFantasyYahooDraftAdvisor(object):
         # https://stackoverflow.com/questions/3121979/how-to-sort-list-tuple-of-lists-tuples
         position_adp_list.sort(key= lambda tup: tup[1])
         return position_adp_list
+
+    def positions_you_have_filled(self):
+        positions_filled = []
+        for player in self.drafted_by_me:
+            positions_filled.append(player.get_position())        
+        return positions_filled
+    
+    def positions_needed(self):
+        filled_positions = self.positions_you_have_filled()
+        needed_positions = []
+        for roster_position in set(self.roster_positions):
+            number_needed_total = self.roster_positions.count(roster_position)
+            number_have = filled_positions.count(roster_position)
+            
+            
+            currently_needed = number_needed_total-number_have
+            needed_positions.append((roster_position, currently_needed))
+        
+        return needed_positions
+ 
+    
+        
+
+
+def simulate_random_drafting(my_draft_advisor, number_of_drafts=10):
+    for _ in range(0, number_of_drafts):
+        top_draftable_players = my_draft_advisor.get_top_draftable_players(5)
+        random_draftable = random.choice(top_draftable_players)
+        my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=False)
+
 
 def main():
     
@@ -160,7 +188,7 @@ def main():
     
     players_list = my_pyfsi.get_player_list_from_data_file(data_file_path)
     
-    league_roster = "QB, WR, WR, RB, RB, TE, K, DEF, BN, BN, BN, BN, BN, IR".split()
+    league_roster = "QB,WR,WR,RB,RB,TE,K,DEF,BN,BN,BN,BN,BN,IR".split(",")
     print(f"{league_roster}")
     my_draft_advisor = PyFantasyYahooDraftAdvisor(players_list, league_roster)
     
@@ -175,40 +203,31 @@ def main():
     position_based_draft_order_avg_adp = my_draft_advisor.sort_positions_based_on_avg_adp()
     print(f"Based on avg adp, the positional priority list is: {position_based_draft_order_avg_adp}")
     
-    
-    
-
-    
-
-    
+        
     # Simulate other people drafting
-    for i in range(0,10):
-        top_draftable_players = my_draft_advisor.get_top_draftable_players(5)
-        random_draftable = random.choice(top_draftable_players)    
-        my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=False)
+    simulate_random_drafting(my_draft_advisor)
 
     
     
     # Simulate me drafting 
+    
     top_draftable_players = my_draft_advisor.get_top_draftable_players(6)
     print(f"top {len(top_draftable_players)} draftable players:")
     for idx, draftable in enumerate(top_draftable_players):
         print(f"#{idx}: Name: {draftable.get_full_name()}, adp:{draftable.get_adp()}, position:{draftable.get_position()}, player_key: {draftable.get_player_key()}")
 
         
-    random_draftable = random.choice(top_draftable_players)      
+    random_draftable = random.choice(top_draftable_players)
     my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=True)
     
     
+  
+    filled_positions = my_draft_advisor.positions_you_have_filled()
+    print(f"Positions You Have Filled:{filled_positions}")
     
-    for position in ysi.PyFantasyYahooSportsInterface.POSSIBLE_POSITIONS:
-        top_draftable_for_pos =  my_draft_advisor.get_top_draftable_players(3, position=position)
-        
-        print(f"TOP PLAYERS FOR POSITION: {position}")
-        for idx, draftable in enumerate(top_draftable_for_pos):        
-            print(f"#{idx}: Name: {draftable.get_full_name()}, adp:{draftable.get_adp()}, position:{draftable.get_position()}, player_key: {draftable.get_player_key()}")
+    needed_positions = my_draft_advisor.positions_needed()
+    print(f"Needed positions: {needed_positions}")
     
-
     
     
 if __name__ == '__main__':
