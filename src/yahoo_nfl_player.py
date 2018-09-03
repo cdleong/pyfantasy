@@ -68,10 +68,12 @@ class YahooNFLPlayer(object):
     def __init__(self, yahoo_ordered_dict):
         self.yahoo_ordered_dict = yahoo_ordered_dict
         self.set_adpf()
-        self.draftable = True
 
     def get_player_key(self):
         return self.yahoo_ordered_dict['player_key']
+        
+    def get_position(self):
+        return self.yahoo_ordered_dict['eligible_positions']['position']
         
     def get_full_name(self):
         return self.yahoo_ordered_dict['name']['full']

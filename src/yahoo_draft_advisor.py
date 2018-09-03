@@ -38,6 +38,8 @@ class PyFantasyYahooDraftAdvisor(object):
         Filters out players with adp of '-'
         Sorts by ADP
         
+        #TODO: handle duplicates
+        
         :param players_list:
         '''
         
@@ -64,9 +66,35 @@ class PyFantasyYahooDraftAdvisor(object):
     def get_top_draftable_players(self, num_players=15):
         self.draftable_players_list.sort(key=operator.attrgetter('adpf'))
         return self.draftable_players_list[0:num_players]
-        
+            
     
+    
+    
+    def draft_player(self, player_key, by_me=False):
+        player_index = None
+        for idx, draftable in enumerate(self.draftable_players_list):
+            if draftable.get_player_key() == player_key:
+                player_index=idx
+                break
+                
+            
         
+        
+        
+        if player_index is not None:
+            player = self.draftable_players_list.pop(player_index)
+            if by_me:
+                print(f"Adding {player.get_full_name()} to your team")
+                self.drafted_by_me.append(player)
+            else:
+                print(f"Adding {player.get_full_name()} to other teams")
+                self.drafted_by_others.append(player)
+        else:
+            print(f"Can't draft {player_key}. Not found in draftable players")
+
+#     def __repr__(self):
+#         #TODO:
+#         return f""
 
 def main():
     
@@ -82,11 +110,27 @@ def main():
     # Process/parse the data
     
     my_draft_advisor = PyFantasyYahooDraftAdvisor(players_list)
-    top_draftable_players = my_draft_advisor.get_top_draftable_players(12)
+    top_draftable_players = my_draft_advisor.get_top_draftable_players(6)
     print(f"top {len(top_draftable_players)} players:")
-    for draftable in top_draftable_players:
-        print(f"Name: {draftable.get_full_name()}, \n\tadp:{draftable.get_adp()}, \n\tplayer_key: {draftable.get_player_key()}")
+    for idx, draftable in enumerate(top_draftable_players):
+        print(f"#{idx}: Name: {draftable.get_full_name()}, adp:{draftable.get_adp()}, position:{draftable.get_position()} player_key: {draftable.get_player_key()}")
     
+
+    #draft test
+
+    
+    
+    random_draftable = random.choice(top_draftable_players)    
+    print(type(random_draftable))
+    my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=False)
+    my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=True)
+    
+    
+    
+    top_draftable_players = my_draft_advisor.get_top_draftable_players(6)
+    print(f"top {len(top_draftable_players)} players:")
+    for idx, draftable in enumerate(top_draftable_players):
+        print(f"#{idx}: Name: {draftable.get_full_name()}, adp:{draftable.get_adp()}, position:{draftable.get_position()}, player_key: {draftable.get_player_key()}")
 
 if __name__ == '__main__':
     main()
