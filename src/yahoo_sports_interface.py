@@ -186,7 +186,7 @@ class PyFantasyYahooSportsInterface(object):
         
         with open(data_file_path, "r") as text_file:
             string_containing_multiple_xml_strings = text_file.read()
-            print(string_containing_multiple_xml_strings)
+            
         
         #split on OPENING_XML_STRING
         xml_strings = string_containing_multiple_xml_strings.split(OPENING_XML_STRING)
