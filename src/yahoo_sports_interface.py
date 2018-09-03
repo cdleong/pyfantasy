@@ -181,6 +181,7 @@ class PyFantasyYahooSportsInterface(object):
 
 
     def get_player_list_from_data_file(self, data_file_path):
+        print(f"Getting data from {data_file_path}")
         
         with open(data_file_path, "r") as text_file:
             string_containing_multiple_xml_strings = text_file.read()
@@ -236,7 +237,7 @@ def main():
     auth_filename="auth_keys.txt"
     pyfsi = PyFantasyYahooSportsInterface(auth_filename)
     
-    download_all_player_data_from_yahoo_and_write_to_files(pyfsi)
+#     download_all_player_data_from_yahoo_and_write_to_files(pyfsi)
 #     download_player_data_for_each_positon_from_yahoo_and_write_to_files(pyfsi)
 
     data_file_path = "../data/all_players.txt"
