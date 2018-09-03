@@ -134,15 +134,16 @@ class PyFantasyYahooSportsInterface(object):
         return self.query_yahoo(query)        
          
     
-    def clear_text_file_and_write(self, base_filename, contents_to_write):
+    def clear_text_file_and_write_multiple_xml_results(self, base_filename, xml_results):
         base_filename = base_filename + ".txt"
         
         #clear it first
         open(base_filename, 'w').close()
         
-        #  add the text
+        #  append        
         with open(base_filename, "a") as text_file:     
-            print(f"{contents_to_write}", file=text_file)    
+            for result in xml_results:
+                print(f"{result}", file=text_file)    
 
     
     def parse_yahoo_xml_string_to_dict(self, xml_string):
@@ -185,6 +186,7 @@ class PyFantasyYahooSportsInterface(object):
         
         with open(data_file_path, "r") as text_file:
             string_containing_multiple_xml_strings = text_file.read()
+            print(string_containing_multiple_xml_strings)
         
         #split on OPENING_XML_STRING
         xml_strings = string_containing_multiple_xml_strings.split(OPENING_XML_STRING)
@@ -204,19 +206,19 @@ def download_all_player_data_from_yahoo_and_write_to_files(pyfsi):
     '''    
     # experimentally determined that there's 2789 "players" in the Yahoo DB. 
     xml_results = pyfsi.download_players_data_xml_strings()
-    base_filename = "all_players"
-    for result in xml_results:
-        pyfsi.clear_text_file_and_write(base_filename, result)
+    base_filename = "../data/all_players"
+    
+    pyfsi.clear_text_file_and_write_multiple_xml_results(base_filename, xml_results)
     
 
-def download_player_data_for_each_positon_from_yahoo_and_write_to_files(pyfsi):
+def download_player_data_for_each_position_from_yahoo_and_write_to_files(pyfsi):
     # get a result for each position
     for position in PyFantasyYahooSportsInterface.POSSIBLE_POSITIONS:
         xml_results = pyfsi.download_players_data_xml_strings(position=position)
   
-        base_filename = position + ".txt"
+        base_filename ="../data/"+ position + ".txt"
         for result in xml_results:
-            pyfsi.clear_text_file_and_write(base_filename, result)
+            pyfsi.clear_text_file_and_write_multiple_xml_results(base_filename, result)
                 
     print("done")    
 
@@ -237,13 +239,13 @@ def main():
     auth_filename="auth_keys.txt"
     pyfsi = PyFantasyYahooSportsInterface(auth_filename)
     
-#     download_all_player_data_from_yahoo_and_write_to_files(pyfsi)
-#     download_player_data_for_each_positon_from_yahoo_and_write_to_files(pyfsi)
+    download_all_player_data_from_yahoo_and_write_to_files(pyfsi)
+    download_player_data_for_each_position_from_yahoo_and_write_to_files(pyfsi)
 
-    data_file_path = "../data/all_players.txt"
-    player_list = pyfsi.get_player_list_from_data_file(data_file_path)
+#     data_file_path = "../data/all_players.txt"
+#     player_list = pyfsi.get_player_list_from_data_file(data_file_path)
     
-    print(random.choice(player_list))
+#     print(random.choice(player_list))
     
     
 
