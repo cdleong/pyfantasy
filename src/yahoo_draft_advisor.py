@@ -14,9 +14,7 @@ from operator import attrgetter
 
 class PyFantasyYahooDraftAdvisor(object):
     _TOP_N = 15
-    '''
-    classdocs
-    '''
+    
     
     
 
@@ -25,17 +23,13 @@ class PyFantasyYahooDraftAdvisor(object):
         '''
         Constructor
         '''        
-        self.players_list = self.pre_process(players_list)
+        self.draftable_players_list = self.pre_process(players_list)
+        self.drafted_by_others = []
+        self.drafted_by_me = []
         
         
         
         
-        for i in range(0, PyFantasyYahooDraftAdvisor._TOP_N):
-            
-            
-
-            player = self.players_list[i]
-            print(f"player {i}: {player.get_last_name()}, adp: {player.get_adp()}")
             
                 
         
@@ -67,6 +61,10 @@ class PyFantasyYahooDraftAdvisor(object):
         return processed_list
 
             
+    def get_top_draftable_players(self, num_players=15):
+        self.draftable_players_list.sort(key=operator.attrgetter('adpf'))
+        return self.draftable_players_list[0:num_players]
+        
     
         
 
@@ -84,6 +82,10 @@ def main():
     # Process/parse the data
     
     my_draft_advisor = PyFantasyYahooDraftAdvisor(players_list)
+    top_draftable_players = my_draft_advisor.get_top_draftable_players(12)
+    print(f"top {len(top_draftable_players)} players:")
+    for draftable in top_draftable_players:
+        print(f"Name: {draftable.get_full_name()}, \n\tadp:{draftable.get_adp()}, \n\tplayer_key: {draftable.get_player_key()}")
     
 
 if __name__ == '__main__':
