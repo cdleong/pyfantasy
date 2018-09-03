@@ -69,9 +69,11 @@ class YahooNFLPlayer(object):
         self.yahoo_ordered_dict = yahoo_ordered_dict
         self.set_adpf()
         self.draftable = True
-    
+
+    def get_player_key(self):
+        return self.yahoo_ordered_dict['player_key']
         
-    def get_last_name(self):
+    def get_full_name(self):
         return self.yahoo_ordered_dict['name']['full']
     
     def get_draft_analysis(self):
