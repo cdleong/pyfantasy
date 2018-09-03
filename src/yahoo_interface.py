@@ -65,9 +65,19 @@ class PyFantasyYahooSportsInterface(object):
         return result.clean_text
     
         
+
+    def download_players_data_list_of_dicts(self, position=""):
+        xml_results = self.download_players_data_xml_strings(position)
+        one_big_list_of_players = self.combine_xml_strings_to_one_big_list_of_players(xml_results)
+        return one_big_list_of_players
+        
         
     
     def download_players_data_xml_strings(self, position=""):
+        '''
+        Returns a list of XML strings.
+        :param position:
+        '''
         
         
         xml_results = []
@@ -91,7 +101,8 @@ class PyFantasyYahooSportsInterface(object):
             if position:
                 print(f"adding position {position} to query")
                 query = query + ";position=" + position
-                    
+
+            # Continue building query so we can loop through and get them all                    
             query = query+";count=" + str(count)             
             query = query + ";start=" + str(start)
             
@@ -110,7 +121,12 @@ class PyFantasyYahooSportsInterface(object):
         return xml_results
     
         
-    def query_league(self, subquery="", league_number=None,):
+    def league_specific_query(self, subquery="", league_number=None,):
+        '''
+        Returns an XML string
+        :param subquery:
+        :param league_number:
+        '''
         if not league_number:
             league_number = input("League number is: ")
         query = "league/nfl.l."+str(league_number) +subquery # get league info    
@@ -149,7 +165,6 @@ class PyFantasyYahooSportsInterface(object):
             players_dict = game_dict['players']    
             player_list = players_dict['player']
             
-            #
         return player_list    
 
 
