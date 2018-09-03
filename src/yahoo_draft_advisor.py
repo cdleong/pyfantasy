@@ -19,7 +19,7 @@ class PyFantasyYahooDraftAdvisor(object):
     
 
 
-    def __init__(self, players_list):
+    def __init__(self, players_list, league_roster_positions):
         '''
         Constructor
         '''        
@@ -27,7 +27,8 @@ class PyFantasyYahooDraftAdvisor(object):
         self.original_draftable_players_list = self.draftable_players_list.copy()
         self.drafted_by_others = []
         self.drafted_by_me = []
-        self.avg_adp_for_each_position = {}
+        self.avg_adp_for_each_position = None
+        self.roster_positions = league_roster_positions
         
         
                 
@@ -112,14 +113,20 @@ class PyFantasyYahooDraftAdvisor(object):
         avg_adp = sum_adp/len(players_at_position)
         return avg_adp
     
-    def calulate_avg_adp_for_each_position(self):
+    def _calulate_avg_adp_for_each_position(self):
         pos_avg_adp_dict = {}
         for position in ysi.PyFantasyYahooSportsInterface.POSSIBLE_POSITIONS:
             avg_adp = self.calculate_avg_adp_for_position(position)
-            print(f"average adp for position {position}: {avg_adp}")
-#             pos_avg_adp_dict[]
+#             print(f"average adp for position {position}: {avg_adp}")
+            pos_avg_adp_dict[position]=avg_adp
             
-            
+        return pos_avg_adp_dict
+    
+    def get_avg_adp_for_each_position(self):
+        if self.avg_adp_for_each_position is None:
+            self.avg_adp_for_each_position = self._calulate_avg_adp_for_each_position()
+
+        return self.avg_adp_for_each_position
 
 def main():
     
@@ -135,41 +142,41 @@ def main():
     
     players_list = my_pyfsi.get_player_list_from_data_file(data_file_path)
     
-          
-    my_draft_advisor = PyFantasyYahooDraftAdvisor(players_list)
+    league_roster = "QB, WR, WR, RB, RB, TE, K, DEF, BN, BN, BN, BN, BN, IR".split()
+    print(f"{league_roster}")
+    my_draft_advisor = PyFantasyYahooDraftAdvisor(players_list, league_roster)
     
     print(f"OK, we've got {len(my_draft_advisor.original_draftable_players_list)} choices to start")
     for position in ysi.PyFantasyYahooSportsInterface.POSSIBLE_POSITIONS:
         all_for_pos = my_draft_advisor.get_all_players_for_position(position)
         print(f"# of existing players at {position}: {len(all_for_pos)}")    
     
-    my_draft_advisor.calulate_avg_adp_for_each_position()
+    pos_avg_adp_dict = my_draft_advisor.get_avg_adp_for_each_position()
+    print(f"Average adp for each position: {pos_avg_adp_dict}")
     
-    top_draftable_players = my_draft_advisor.get_top_draftable_players(6)
-    print(f"top {len(top_draftable_players)} players:")
-    for idx, draftable in enumerate(top_draftable_players):
-        print(f"#{idx}: Name: {draftable.get_full_name()}, adp:{draftable.get_adp()}, position:{draftable.get_position()} player_key: {draftable.get_player_key()}")
+    
     
 
-    #draft test
+    
+
+    
+    # Simulate other people drafting
+    for i in range(0,10):
+        top_draftable_players = my_draft_advisor.get_top_draftable_players(5)
+        random_draftable = random.choice(top_draftable_players)    
+        my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=False)
 
     
     
-    random_draftable = random.choice(top_draftable_players)    
-    print(type(random_draftable))
-    my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=False)
-    my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=True)
-    
-    
-    
+    # Simulate me drafting 
     top_draftable_players = my_draft_advisor.get_top_draftable_players(6)
-    print(f"top {len(top_draftable_players)} players:")
+    print(f"top {len(top_draftable_players)} draftable players:")
     for idx, draftable in enumerate(top_draftable_players):
         print(f"#{idx}: Name: {draftable.get_full_name()}, adp:{draftable.get_adp()}, position:{draftable.get_position()}, player_key: {draftable.get_player_key()}")
 
         
-        
-    
+    random_draftable = random.choice(top_draftable_players)      
+    my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=True)
     
 
     
