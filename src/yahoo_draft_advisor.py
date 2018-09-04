@@ -162,8 +162,6 @@ class PyFantasyYahooDraftAdvisor(object):
         
         return needed_positions
  
-    
-        
 
 
 def simulate_random_drafting(my_draft_advisor, number_of_drafts=10):

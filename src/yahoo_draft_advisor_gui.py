@@ -45,10 +45,10 @@ class PyFantasyGUI(QWidget):
         qbtn.clicked.connect(QApplication.instance().quit)
         
         draft_player_btn = QPushButton('Draft Him', self)
-        draft_player_btn.clicked.connect(self.first_for_me)
+        draft_player_btn.clicked.connect(self.draft_for_me)
         
         player_taken_btn = QPushButton("He is taken", self)
-        player_taken_btn.clicked.connect(self.first_for_others)
+        player_taken_btn.clicked.connect(self.draft_for_others)
         
         
         
@@ -74,27 +74,39 @@ class PyFantasyGUI(QWidget):
         self.show()
 
     
-    def draft_and_regenerate(self, by_me=False):
-        self.combo.removeItem(0)
-        first_guy_key = self.draftable_players[0].get_player_key()
-        self.draft_advisor.draft_player(first_guy_key, by_me=by_me)
+    def regenerate_combo(self):
         self.draftable_players = self.draft_advisor.get_top_draftable_players()
         self.combo.clear()
         for draftable_player in self.draftable_players:
             self.combo.addItem(str(draftable_player))
+        self.onActivated(str(self.draftable_players[0]))
+        
+    
+    def draft_and_regenerate(self, by_me=False):
+        
+        currently_selected_guy_key = self.current_key
+        self.draft_advisor.draft_player(currently_selected_guy_key, by_me=by_me)
+        self.regenerate_combo()
             
     
-    def first_for_others(self):
+    def draft_for_others(self):
         self.draft_and_regenerate()
         
-    def first_for_me(self):
+    def draft_for_me(self):
         self.draft_and_regenerate(by_me=True)
                 
         
+    def find_key(self, text):    
         
+        for player in self.draftable_players:
+            if str(player) == text:
+                player_key = player.get_player_key()
+                print(f"found key: {player_key}")
+                return player_key
+                
         
     def onActivated(self, text):
-      
+        self.current_key = self.find_key(text)
         self.lbl.setText(text)
         self.lbl.adjustSize()  
         
