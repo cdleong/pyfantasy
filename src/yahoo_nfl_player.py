@@ -97,4 +97,10 @@ class YahooNFLPlayer(object):
     def get_adpf(self):
         return self.adpf
     
+    def __str__(self, *args, **kwargs):
+        
+        my_str = str(self.get_full_name())
+        my_str += ", Position: "+str(self.position)
+        my_str += ", ADP: "+str(self.get_adp())
+        return my_str
     

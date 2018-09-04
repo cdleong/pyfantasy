@@ -11,7 +11,6 @@ from operator import attrgetter
 
 
 
-
 class PyFantasyYahooDraftAdvisor(object):
     _TOP_N = 15
     
@@ -174,23 +173,34 @@ def simulate_random_drafting(my_draft_advisor, number_of_drafts=10):
         my_draft_advisor.draft_player(random_draftable.get_player_key(), by_me=False)
 
 
-def main():
-    
+
+def load_data(get_updated_data = False):
     auth_filename="auth_keys.txt"
     data_file_path = "../data/all_players.txt"
     
     # load data    
     my_pyfsi = ysi.PyFantasyYahooSportsInterface(auth_filename)
     
-    get_updated_data = False
+    
     if get_updated_data:
         my_pyfsi.download_all_player_data_from_yahoo_and_write_to_files(data_file_path)
     
     players_list = my_pyfsi.get_player_list_from_data_file(data_file_path)
+    return players_list    
+    
+
+def main():
+    
+
     
     league_roster = "QB,WR,WR,RB,RB,TE,K,DEF,BN,BN,BN,BN,BN,IR".split(",")
     print(f"{league_roster}")
+    
+    players_list = load_data()
+    
     my_draft_advisor = PyFantasyYahooDraftAdvisor(players_list, league_roster)
+    
+    
     
     print(f"OK, we've got {len(my_draft_advisor.original_draftable_players_list)} choices to start")
     for position in ysi.PyFantasyYahooSportsInterface.POSSIBLE_POSITIONS:
