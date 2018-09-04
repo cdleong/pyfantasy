@@ -1,4 +1,41 @@
 '''
+
+NOTE: according to http://www.nfl.com/fantasyfootball/story/0ap3000000509944/article/the-perfect-roundbyround-fantasy-draft-strategy
+The proper draft order is: 
+1. RB
+2. WR
+3. RB or WR
+4. RB or WR
+5. RB or WR
+6. RB or WR
+7. RB, WR or TE
+8. QB, RB, or WR
+9. QB, RB, WR
+10. QB, RB, WR or TE
+11. QB, RB, WR or TE
+12. QB, RB, WR or TE
+13. Stephen Gostkowski -_-
+14. K or D/ST
+15. K or D/ST
+
+According to http://www.nfl.com/fantasyfootball/story/0ap3000000936204/article/the-best-fantasy-football-draft-strategy-for-2018
+1. RB
+2. RB or WR
+3. RB or WR
+4. RB or WR (two each after this round)
+5. Best Available
+6. Best Available
+7. Best Available
+8. QB or TE if not already
+9. QB or TE if not already
+10. RB or WR or QB or TE " At this point in the draft, you probably have three to four running backs, three to four wide receivers, one quarterback, one tight end or one at either position"  
+11. RB or WR or QB or TE
+12. RB or WR or QB or TE
+13. RB or WR or QB or TE
+14. K or D/ST
+15. K or D/ST
+
+#TODO: encode the above into some sort of recommmendation?
 Created on Sep 3, 2018
 
 @author: cdleong
