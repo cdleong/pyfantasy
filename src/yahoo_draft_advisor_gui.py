@@ -5,7 +5,7 @@ Created on Sep 3, 2018
 @author: cdleong
 '''
 from PyQt5.QtWidgets import (QWidget, QLabel, 
-    QComboBox, QApplication)
+    QComboBox, QApplication, QPushButton, QHBoxLayout, QVBoxLayout)
 import sys
 import yahoo_draft_advisor as yda
 
@@ -17,28 +17,80 @@ class PyFantasyGUI(QWidget):
         self.draft_advisor = draft_advisor
         self.initUI()
         
+    
         
+            
     def initUI(self):      
 
         
-        
-        draftable_players = self.draft_advisor.get_top_draftable_players(10)
-        self.lbl = QLabel(str(draftable_players[0]), self)
+
+        self.draftable_players = self.draft_advisor.get_top_draftable_players(10)
+        self.lbl = QLabel(str(self.draftable_players[0]), self)
          
         
-        combo = QComboBox(self)
+        self.combo = QComboBox(self)
         
-        for item in draftable_players:
-            combo.addItem(str(item))
+        for item in self.draftable_players:
+            self.combo.addItem(str(item))
 
-        combo.move(50, 50)
-        self.lbl.move(50, 150)
+#         self.combo.move(50, 50)
+#         self.lbl.move(50, 150)
 
-        combo.activated[str].connect(self.onActivated)        
+        self.combo.activated[str].connect(self.onActivated)        
          
+         
+        #QUIT BUTTON
+        qbtn = QPushButton('Quit', self)
+#         qbtn.move(50, 50)
+        qbtn.clicked.connect(QApplication.instance().quit)
+        
+        draft_player_btn = QPushButton('Draft Him', self)
+        draft_player_btn.clicked.connect(self.first_for_me)
+        
+        player_taken_btn = QPushButton("He is taken", self)
+        player_taken_btn.clicked.connect(self.first_for_others)
+        
+        
+        
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        
+        
+        hbox.addWidget(qbtn)
+        hbox.addWidget(draft_player_btn)
+        hbox.addWidget(player_taken_btn)
+        hbox.addWidget(self.combo)
+        hbox.addWidget(self.lbl)
+
+        vbox = QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addLayout(hbox)
+        
+        
+        self.setLayout(vbox)  
+        
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('PyFantasyGUI')
         self.show()
+
+    
+    def draft_and_regenerate(self, by_me=False):
+        self.combo.removeItem(0)
+        first_guy_key = self.draftable_players[0].get_player_key()
+        self.draft_advisor.draft_player(first_guy_key, by_me=by_me)
+        self.draftable_players = self.draft_advisor.get_top_draftable_players()
+        self.combo.clear()
+        for draftable_player in self.draftable_players:
+            self.combo.addItem(str(draftable_player))
+            
+    
+    def first_for_others(self):
+        self.draft_and_regenerate()
+        
+    def first_for_me(self):
+        self.draft_and_regenerate(by_me=True)
+                
+        
         
         
     def onActivated(self, text):
