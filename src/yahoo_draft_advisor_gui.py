@@ -26,6 +26,7 @@ class PyFantasyGUI(QWidget):
 
         self.draftable_players = self.draft_advisor.get_top_draftable_players(10)
         self.lbl = QLabel(str(self.draftable_players[0]), self)
+        self.current_key = self.find_key(str(self.draftable_players[0]))
          
         
         self.combo = QComboBox(self)
@@ -36,7 +37,8 @@ class PyFantasyGUI(QWidget):
 #         self.combo.move(50, 50)
 #         self.lbl.move(50, 150)
 
-        self.combo.activated[str].connect(self.onActivated)        
+        self.combo.activated[str].connect(self.onActivated)       
+         
          
          
         #QUIT BUTTON
@@ -75,6 +77,7 @@ class PyFantasyGUI(QWidget):
 
     
     def regenerate_combo(self):
+        print("regenerating combo box")
         self.draftable_players = self.draft_advisor.get_top_draftable_players()
         self.combo.clear()
         for draftable_player in self.draftable_players:
@@ -85,6 +88,7 @@ class PyFantasyGUI(QWidget):
     def draft_and_regenerate(self, by_me=False):
         
         currently_selected_guy_key = self.current_key
+        print(f"Drafting key {currently_selected_guy_key}. By me = {by_me}")
         self.draft_advisor.draft_player(currently_selected_guy_key, by_me=by_me)
         self.regenerate_combo()
             
@@ -93,6 +97,7 @@ class PyFantasyGUI(QWidget):
         self.draft_and_regenerate()
         
     def draft_for_me(self):
+        
         self.draft_and_regenerate(by_me=True)
                 
         
