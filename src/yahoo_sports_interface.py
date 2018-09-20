@@ -192,6 +192,7 @@ class PyFantasyYahooSportsInterface(object):
         xml_strings = string_containing_multiple_xml_strings.split(OPENING_XML_STRING)
         
         combined_player_list = self.combine_xml_strings_to_one_big_list_of_players(xml_strings)
+        print(f"Got {len(combined_player_list)} players")
         return combined_player_list
 
 
