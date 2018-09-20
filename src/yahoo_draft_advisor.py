@@ -231,7 +231,7 @@ def main():
     league_roster = "QB,WR,WR,RB,RB,TE,K,DEF,BN,BN,BN,BN,BN,IR".split(",")
     print(f"{league_roster}")
     
-    players_list = load_data()
+    players_list = load_data(get_updated_data=True)
     
     my_draft_advisor = PyFantasyYahooDraftAdvisor(players_list, league_roster)
     
