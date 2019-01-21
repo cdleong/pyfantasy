@@ -85,6 +85,8 @@ class PyFantasyYahooSportsInterface(object):
             print(f"{xml}", file=text_file)
 
 
+
+
     def download_players_data_xml_strings(self, position=""):
         '''
         Returns a list of XML strings.
@@ -108,6 +110,8 @@ class PyFantasyYahooSportsInterface(object):
 
             # base query
             query = "game/nfl/players;out=draft_analysis,percent_owned,stats"
+            league_num=0 # TODO: ask user for this
+            league_query = f"league/nfl.l.{league_num}/players;out=draft_analysis,percent_owned,stats"
 
             # Just one position?
             if position:
@@ -138,6 +142,11 @@ class PyFantasyYahooSportsInterface(object):
         Returns an XML string
         :param subquery:
         :param league_number:
+
+        see also https://developer.yahoo.com/fantasysports/guide/players-collection.html
+        and https://developer.yahoo.com/fantasysports/guide/league-resource.html#league-resource-key_format
+        'league/{league_key}/players'
+        so for example "league/nfl.l.42"
         '''
         if not league_number:
             league_number = input("League number is: ")
@@ -245,7 +254,7 @@ def main():
     pyfsi = PyFantasyYahooSportsInterface(auth_filename)
 
     pyfsi.download_stat_categories()
-#    pyfsi.download_all_player_data_from_yahoo_and_write_to_files()
+    pyfsi.download_all_player_data_from_yahoo_and_write_to_files("../data/all_league_players.txt")
 #    pyfsi.download_player_data_for_each_position_from_yahoo_and_write_to_files(pyfsi)
 
 #    data_file_path = "../data/all_players.txt"
