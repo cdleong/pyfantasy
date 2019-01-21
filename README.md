@@ -12,6 +12,18 @@ Using Python to have fun with fantasy sports!
 ### Setup 
 (Still in development!)
 
+
+## YahoSports Data scraping: 
+
+Query documentation can be found here: https://developer.yahoo.com/fantasysports/guide/
+
+Basically, the query goes "game/nfl/something"
+
+Player resource: https://developer.yahoo.com/fantasysports/guide/#player-resource  or https://developer.yahoo.com/fantasysports/guide/player-resource.html
+Game resource: https://developer.yahoo.com/fantasysports/guide/game-resource.html
+
+You need to generate an auth file using your Yahoo developer credentials: https://developer.yahoo.com/apps/ and [YahooSports](https://github.com/thorrr/YahooSports)
+
 ## Authors
 
 * **[Colin Leong]((https://github.com/cdleong))**  
