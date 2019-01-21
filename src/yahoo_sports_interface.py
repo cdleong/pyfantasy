@@ -6,8 +6,9 @@ Created on Aug 29, 2018
 import YahooSports as ysp
 import math
 import xmltodict
-from distutils import text_file
+import pandas as pd
 import random
+import pprint
 secure_random = random.SystemRandom()
 
 
@@ -71,6 +72,17 @@ class PyFantasyYahooSportsInterface(object):
         one_big_list_of_players = self.combine_xml_strings_to_one_big_list_of_players(xml_results)
         return one_big_list_of_players
 
+    def download_stat_categories(self):
+        '''
+        https://developer.yahoo.com/fantasysports/guide/game-resource.html
+        http://fantasysports.yahooapis.com/fantasy/v2/game/nfl/stat_categories
+        '''
+        query = "game/nfl/stat_categories"
+        result = self.query_yahoo(query)
+        xml = self.get_xml_from_yahoo_result(result)
+        file_path = "../data/stat_categories.txt"
+        with open(file_path, "a") as text_file:
+            print(f"{xml}", file=text_file)
 
 
     def download_players_data_xml_strings(self, position=""):
@@ -95,7 +107,7 @@ class PyFantasyYahooSportsInterface(object):
             print(f"i: {i}, start:{start}")
 
             # base query
-            query = "game/nfl/players;out=draft_analysis,percent_owned"
+            query = "game/nfl/players;out=draft_analysis,percent_owned,stats"
 
             # Just one position?
             if position:
@@ -224,29 +236,27 @@ class PyFantasyYahooSportsInterface(object):
         print("done")
 
 
-
-
-
-
-
-
-
-
-
-
+def player_list_as_dataframe(player_ordereddict):
+    return pd.DataFrame.from_dict(player_ordereddict)
 
 
 def main():
     auth_filename="auth_keys.txt"
     pyfsi = PyFantasyYahooSportsInterface(auth_filename)
 
+    pyfsi.download_stat_categories()
 #    pyfsi.download_all_player_data_from_yahoo_and_write_to_files()
 #    pyfsi.download_player_data_for_each_position_from_yahoo_and_write_to_files(pyfsi)
 
-    data_file_path = "../data/all_players.txt"
-    player_list = pyfsi.get_player_list_from_data_file(data_file_path)
+#    data_file_path = "../data/all_players.txt"
+#    player_list = pyfsi.get_player_list_from_data_file(data_file_path)
 
-    print(secure_random.choice(player_list))
+#    random_player = secure_random.choice(player_list)
+#    pprint.pprint(random_player)
+
+    #player_df = player_list_as_dataframe(player_list)
+    #print(player_df.info())
+    #print(player_df.describe())
 
 
 
