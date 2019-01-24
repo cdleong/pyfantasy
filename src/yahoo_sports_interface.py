@@ -14,6 +14,7 @@ secure_random = random.SystemRandom()
 
 OPENING_XML_STRING = '''<?xml version="1.0" ?>'''
 
+
 class PyFantasyYahooSportsInterface(object):
     # CLASS CONSTANTS
     NFL_PLAYERS_PER_TEAM = 53
@@ -25,8 +26,7 @@ class PyFantasyYahooSportsInterface(object):
     MAX_NFL_PLAYERS = (NFL_PLAYERS_PER_TEAM*NUMBER_OF_NFL_TEAMS) + NUMBER_OF_DEFENSES
     MAX_RETURNED_PER_QUERY = 25  # determined experimentally
     MAX_QUERY = math.ceil(MAX_NFL_PLAYERS/MAX_RETURNED_PER_QUERY)*2
-    POSSIBLE_POSITIONS = ["QB", "WR", "RB", "TE", "K" , "DEF"]
-
+    POSSIBLE_POSITIONS = ["QB", "WR", "RB", "TE", "K", "DEF"]
 
     def __init__(self, auth_filename):
         '''
@@ -35,7 +35,6 @@ class PyFantasyYahooSportsInterface(object):
         print(f"Initializing {self}")
         self.auth_filename = auth_filename
         self.session = None
-
 
     def connect(self):
 
@@ -52,7 +51,6 @@ class PyFantasyYahooSportsInterface(object):
 
         self.session = session
 
-
     def query_yahoo(self, query):
         if self.session is None:
             self.connect()
@@ -64,8 +62,6 @@ class PyFantasyYahooSportsInterface(object):
 
     def get_xml_from_yahoo_result(self, result):
         return result.clean_text
-
-
 
     def download_players_data_list_of_dicts(self, position=""):
         xml_results = self.download_players_data_xml_strings(position)
@@ -84,23 +80,17 @@ class PyFantasyYahooSportsInterface(object):
         with open(file_path, "a") as text_file:
             print(f"{xml}", file=text_file)
 
-
-
-
     def download_players_data_xml_strings(self, position=""):
         '''
         Returns a list of XML strings.
         :param position:
         '''
-
-
         xml_results = []
         count = PyFantasyYahooSportsInterface.MAX_RETURNED_PER_QUERY
         start = 0
         count_string = "players count"
         i = 0
         more_players_to_retrieve = True
-
 
         while i < PyFantasyYahooSportsInterface.MAX_QUERY and more_players_to_retrieve:
             start = i * count
@@ -110,8 +100,10 @@ class PyFantasyYahooSportsInterface(object):
 
             # base query
             query = "game/nfl/players;out=draft_analysis,percent_owned,stats"
-            league_num=0 # TODO: ask user for this
-            league_query = f"league/nfl.l.{league_num}/players;out=draft_analysis,percent_owned,stats"
+
+#            league_num = 0  # TODO: ask user for league_num arg, use this if
+#            they provided one.
+#            league_query = f"league/nfl.l.{league_num}/players;out=draft_analysis,percent_owned,stats"
 
             # Just one position?
             if position:
@@ -136,7 +128,6 @@ class PyFantasyYahooSportsInterface(object):
 
         return xml_results
 
-
     def league_specific_query(self, subquery="", league_number=None,):
         '''
         Returns an XML string
@@ -150,15 +141,12 @@ class PyFantasyYahooSportsInterface(object):
         '''
         if not league_number:
             league_number = input("League number is: ")
-        query = "league/nfl.l."+str(league_number) +subquery # get league info
+        query = "league/nfl.l." + str(league_number) + subquery  # get league info
 
         return self.query_yahoo(query)
 
-
     def clear_text_file_and_write_multiple_xml_results(self, file_path, xml_results):
-
-
-        #clear it first
+        # clear it first
         open(file_path, 'w').close()
 
         #  append
@@ -166,14 +154,12 @@ class PyFantasyYahooSportsInterface(object):
             for result in xml_results:
                 print(f"{result}", file=text_file)
 
-
     def parse_yahoo_xml_string_to_dict(self, xml_string):
-        #remove the first line, with the "<?xml version="1.0" ?>"
+        # remove the first line, with the "<?xml version="1.0" ?>"
         if OPENING_XML_STRING in xml_string:
             xml_string.replace(OPENING_XML_STRING, "")
 
         return xmltodict.parse(xml_string)
-
 
     def get_player_list_from_xml_string(self, xml_string_to_parse):
         '''
@@ -189,11 +175,9 @@ class PyFantasyYahooSportsInterface(object):
 
         return player_list
 
-
     def combine_xml_strings_to_one_big_list_of_players(self, xml_strings):
 
         combined_player_list = []
-
 
         for xml_string in xml_strings:
             if xml_string:
@@ -201,25 +185,18 @@ class PyFantasyYahooSportsInterface(object):
 
         return combined_player_list
 
-
     def get_player_list_from_data_file(self, data_file_path):
         print(f"Getting data from {data_file_path}")
 
         with open(data_file_path, "r") as text_file:
             string_containing_multiple_xml_strings = text_file.read()
 
-
-        #split on OPENING_XML_STRING
+        # split on OPENING_XML_STRING
         xml_strings = string_containing_multiple_xml_strings.split(OPENING_XML_STRING)
 
         combined_player_list = self.combine_xml_strings_to_one_big_list_of_players(xml_strings)
         print(f"Got {len(combined_player_list)} players")
         return combined_player_list
-
-
-
-
-
 
     def download_all_player_data_from_yahoo_and_write_to_files(self, download_path="../data/all_players.txt"):
         '''
@@ -229,16 +206,15 @@ class PyFantasyYahooSportsInterface(object):
         # experimentally determined that there's 2789 "players" in the Yahoo DB.
         xml_results = self.download_players_data_xml_strings()
 
-
         self.clear_text_file_and_write_multiple_xml_results(download_path, xml_results)
-
 
     def download_player_data_for_each_position_from_yahoo_and_write_to_files(self):
         # get a result for each position
         for position in PyFantasyYahooSportsInterface.POSSIBLE_POSITIONS:
             xml_results = self.download_players_data_xml_strings(position=position)
 
-            base_filename ="../data/"+ position + ".txt"
+            # TODO: arg?
+            base_filename = "../data/" + position + ".txt"
             for result in xml_results:
                 self.clear_text_file_and_write_multiple_xml_results(base_filename, result)
 
@@ -250,7 +226,8 @@ def player_list_as_dataframe(player_ordereddict):
 
 
 def main():
-    auth_filename="auth_keys.txt"
+    # TODO: argparse - download or read?
+    auth_filename = "auth_keys.txt"
     pyfsi = PyFantasyYahooSportsInterface(auth_filename)
 
     pyfsi.download_stat_categories()
@@ -263,11 +240,9 @@ def main():
 #    random_player = secure_random.choice(player_list)
 #    pprint.pprint(random_player)
 
-    #player_df = player_list_as_dataframe(player_list)
-    #print(player_df.info())
-    #print(player_df.describe())
-
-
+#    player_df = player_list_as_dataframe(player_list)
+#    print(player_df.info())
+#    print(player_df.describe())
 
 
 if __name__ == "__main__":
