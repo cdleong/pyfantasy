@@ -61,3 +61,9 @@ if __name__ == "__main__":
         plt.title(position+f"_top_{top_n}")
         fig = g.get_figure()
         fig.savefig(position+f"_top_{top_n}.png")
+
+    plt.figure()
+    g = sns.boxplot(x="position", y="points", data=player_df)
+    plt.title("Point Distribution by position")
+    fig=g.get_figure()
+    fig.savefig("player_box.png")
