@@ -52,7 +52,7 @@ if __name__ == "__main__":
         fig = g.get_figure()
         fig.savefig(position+".png")
 
-        top_n = 14
+        top_n = 28
         plt.figure()
         top_df = pos_df.tail(top_n)
         g = sns.distplot(top_df['points'],
