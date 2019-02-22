@@ -9,7 +9,9 @@ import xmltodict
 import pandas as pd
 import random
 import data_parser
+import pprint
 secure_random = random.SystemRandom()
+
 
 class PyFantasyYahooSportsInterface(object):
     # CLASS CONSTANTS
@@ -19,9 +21,9 @@ class PyFantasyYahooSportsInterface(object):
 
     # experimentally determined that there's 2789 "players" in the Yahoo DB, actually
     # TODO: fix calculation method
-    MAX_NFL_PLAYERS = (NFL_PLAYERS_PER_TEAM*NUMBER_OF_NFL_TEAMS) + NUMBER_OF_DEFENSES
+    MAX_NFL_PLAYERS = (NFL_PLAYERS_PER_TEAM * NUMBER_OF_NFL_TEAMS) + NUMBER_OF_DEFENSES
     MAX_RETURNED_PER_QUERY = 25  # determined experimentally
-    MAX_QUERY = math.ceil(MAX_NFL_PLAYERS/MAX_RETURNED_PER_QUERY)*2
+    MAX_QUERY = math.ceil(MAX_NFL_PLAYERS / MAX_RETURNED_PER_QUERY) * 2
     POSSIBLE_POSITIONS = ["QB", "WR", "RB", "TE", "K", "DEF"]
 
     def __init__(self, auth_filename):
@@ -31,6 +33,10 @@ class PyFantasyYahooSportsInterface(object):
         print(f"Initializing {self}")
         self.auth_filename = auth_filename
         self.session = None
+        self.league_num = None
+        if yes_or_no("Would you like stats for your specific league? "):
+            # TODO: validate user input
+            self.league_num = int(input("What is the league number?"))
 
     def connect(self):
 
@@ -73,7 +79,7 @@ class PyFantasyYahooSportsInterface(object):
         result = self.query_yahoo(query)
         xml = self.get_xml_from_yahoo_result(result)
         file_path = "../data/stat_categories.txt"
-        with open(file_path, "a") as text_file:
+        with open(file_path, "a+") as text_file:
             print(f"{xml}", file=text_file)
 
     def download_players_data_xml_strings(self, position=""):
@@ -97,9 +103,12 @@ class PyFantasyYahooSportsInterface(object):
             # base query
             query = "game/nfl/players;out=draft_analysis,percent_owned,stats"
 
-#            league_num = 0  # TODO: ask user for league_num arg, use this if
-#            they provided one.
-#            league_query = f"league/nfl.l.{league_num}/players;out=draft_analysis,percent_owned,stats"
+            if self.league_num:
+#               league_query = f"league/nfl.l.{league_num}/players;out=draft_analysis,percent_owned,stats"
+                query = "league/nfl.l.{}/players;out=draft_analysis,percent_owned,stats".format(self.league_num)
+
+            else:
+                print("League Number not known. Cannot get league-specific stats.")
 
             # Just one position?
             if position:
@@ -107,7 +116,7 @@ class PyFantasyYahooSportsInterface(object):
                 query = query + ";position=" + position
 
             # Continue building query so we can loop through and get them all
-            query = query+";count=" + str(count)
+            query = query + ";count=" + str(count)
             query = query + ";start=" + str(start)
 
             print(f"Final query: {query}")
@@ -141,8 +150,6 @@ class PyFantasyYahooSportsInterface(object):
 
         return self.query_yahoo(query)
 
-
-
     def download_all_player_data_from_yahoo_and_write_to_files(self, download_path="../data/all_players.txt"):
         '''
         Download all the data to text files.
@@ -165,9 +172,33 @@ class PyFantasyYahooSportsInterface(object):
 
         print("done")
 
+    # TODO: clear all this out, and just use csv files.
+    def clear_text_file_and_write_multiple_xml_results(self, file_path, xml_results):
+        # clear it first
+        open(file_path, 'w').close()
+
+        #  append
+        with open(file_path, "a") as text_file:
+            for result in xml_results:
+                print(f"{result}", file=text_file)
+
 
 def player_list_as_dataframe(player_ordereddict):
     return pd.DataFrame.from_dict(player_ordereddict)
+
+
+def yes_or_no(prompt):
+        # raw_input returns the empty string for "enter"
+    yes = {'yes', 'y', 'ye', ''}
+    no = {'no', 'n'}
+
+    choice = input(prompt).lower()
+    if choice in yes:
+        return True
+    elif choice in no:
+        return False
+    else:
+        print("Please respond with 'yes' or 'no'")
 
 
 def main():
@@ -177,10 +208,11 @@ def main():
 
     pyfsi.download_stat_categories()
     pyfsi.download_all_player_data_from_yahoo_and_write_to_files("../data/all_league_players.txt")
-#    pyfsi.download_player_data_for_each_position_from_yahoo_and_write_to_files(pyfsi)
+    pyfsi.download_player_data_for_each_position_from_yahoo_and_write_to_files()
 
-    data_file_path = "../data/all_players.txt"
-    player_list = pyfsi.get_player_list_from_data_file(data_file_path)
+    # The following are removed for now
+#    data_file_path = "../data/all_players.txt"
+#    player_list = pyfsi.get_player_list_from_data_file(data_file_path)
 
 #    random_player = secure_random.choice(player_list)
 #    pprint.pprint(random_player)
