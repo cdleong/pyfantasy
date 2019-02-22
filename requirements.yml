@@ -1,0 +1,14 @@
+name: pyfantasy
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - matplotlib
+  - numpy
+  - pandas
+  - pyqt
+  - rauth
+  - requests
+  - scipy
+  - seaborn
+  - xmltodict
