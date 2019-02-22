@@ -12,6 +12,13 @@ Using Python to have fun with fantasy sports!
 ### Setup 
 (Still in development!)
 
+```
+# setup conda environment.
+conda env create -n pyfantasy -f requirements.yml
+```
+
+
+
 
 ## YahoSports Data scraping: 
 
