@@ -2,6 +2,7 @@
 
 Using Python to have fun with fantasy sports!
 
+![](images/player_box.png)
 
 ## Getting Started
 (TODO, Still in development!)
